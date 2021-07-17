@@ -102,9 +102,9 @@ class MeshDrawer {
         this.mvp = gl.getUniformLocation(this.prog, 'mvp');
         this.mv = gl.getUniformLocation(this.prog, 'mv');
         this.mn = gl.getUniformLocation(this.prog, 'mn');
-
+        this.I = gl.getUniformLocation(this.prog, 'I');
+        this.Ia = gl.getUniformLocation(this.prog, 'Ia');
         this.light = gl.getUniformLocation(this.prog, 'light');
-
 
         // 3. Obtenemos los IDs de los atributos de los vértices en los shaders
         this.vertPos = gl.getAttribLocation(this.prog, 'pos');
@@ -245,6 +245,16 @@ class MeshDrawer {
         gl.useProgram(this.prog);
         gl.uniform1f(this.shininess, shininess);
     }
+
+    setIaValue(Ia) {
+        gl.useProgram(this.prog);
+        gl.uniform4fv(this.Ia, [Ia, Ia, Ia, 1.0]);
+    }
+
+    setIValue(I) {
+        gl.useProgram(this.prog);
+        gl.uniform4fv(this.I, [I, I, I, 1.0]);
+    }
 }
 
 // [COMPLETAR] Calcular iluminación utilizando Blinn-Phong.
@@ -308,18 +318,23 @@ var meshFS =
 	uniform mat3 mn;
     uniform vec3 light;
     uniform mat4 mv;
+    uniform vec4 I;
+    uniform vec4 Ia;
 
 	varying vec2 texCoord;
 	varying vec3 normCoord;
 	uniform sampler2D texGPU;
 	varying vec4 vertCoord;
-		
+	
 	void main()
 	{		
         vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
-        vec4 I = white;
-        vec4 Ia = white;
+        vec4 grey = vec4(0.5, 0.5, 0.5, 1.0);
+        //
+        // vec4 I = white;
+        // vec4 Ia = grey;
         
+        vec3 light_normalized = normalize(light);
         vec3 n = normalize(mn * normCoord);
         vec3 v = - vec3(mv * vertCoord);
         
@@ -334,11 +349,13 @@ var meshFS =
             Ka = Kd;
         }
         
-        float cos_theta = dot(n, light);
+        float cos_theta = dot(n, light_normalized);
         
-        vec3 r = 2.0*dot(light, n)*n - light;  
+        vec3 r = 2.0*dot(light, n)*n - light_normalized;  
         float cos_sigma = dot(v, r);
         
-        gl_FragColor = I*( Kd*max(0.0, cos_theta) );        
+        float alpha = log(1.0+pow(exp(1.0),shininess));
+        
+        gl_FragColor = I*Kd*max(0.0, cos_theta)*(Kd + Ks*(pow(max(0.0, cos_sigma), alpha)/cos_theta)) + Ia*Ka;
 	}
 `;

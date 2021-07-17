@@ -26,6 +26,8 @@
             <div class="control"><input id="auto-rotate" name="auto-rotate" type="checkbox" onchange="AutoRotate(this)"/><label for="auto-rotate"> Calesita</label></div>
             <div class="control"><input id="rotation-speed" type="range" min="1" max="100" value="50" disabled/></div>
             <div class="control"><span id="shininess-label">Intensidad:</span><span id="shininess-value">1</span><input id="shininess-exp" type="range" min="0" max="100" value="50" oninput="SetShininess(this)"/></div>
+            <div class="control"><span id="I_value-label">Intensidad de I:</span><span id="I-value">1</span><input id="I" type="range" min="0" max="1" step="0.1" oninput="SetIValue(this)"/></div>
+            <div class="control"><span id="Ia_value-label">Intensidad de Ia:</span><span id="Ia-value">0.1</span><input id="Ia" type="range" min="0" max="1" step="0.1" oninput="SetIaValue(this)"/></div>
         </div>
         <div class="control-group">
             <div class="control">Modelo:<br/><input id="obj" type="file" onchange="LoadObj(this)" accept=".obj"/></div>
